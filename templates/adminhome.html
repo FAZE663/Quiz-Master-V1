@@ -1,0 +1,367 @@
+{% extends "hometemplate.html" %}
+
+{% block title %}Admin Home{% endblock %}
+{% block content %}
+<div class="container mt-4"> 
+    <div class="row">
+        {% for sub in subdet %}
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4 p-3"> 
+                <div class="card-body">
+                    <div class="d-flex justify-content-between p-3" >
+                        <h5 class="card-title">{{sub.id}}. {{sub.name}}</h5>
+                        <div class="d-flex justify-content-center">
+                            <a class="btn btn-danger deletesubject ms-1" data-subid="{{sub.id}}">Delete</a> 
+                            <a class="btn btn-success editsubject ms-1" data-bs-toggle="modal" data-bs-target="#editSubjectModal" data-subid="{{sub.id}}">Edit</a>
+                        </div>
+                    </div>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Chapter</th>
+                                <th>No. of Questions</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for chap in sub.chapters %}
+                            <tr>
+                                <td>{{chap.title}}</td>
+                                <td>{{chap.question_count}}</td>
+                                <td><a class="btn btn-success editchapter" data-bs-toggle="modal" data-bs-target="#editChapterModal" data-chapterid="{{chap.id}}">Edit</a> 
+                                    <a class="btn btn-danger deletechapter" data-chapid="{{chap.id}}" >Delete</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button class="btn btn-success add-chapter-button" data-bs-toggle="modal" data-bs-target="#addChapterModal" data-subjectid="{{sub.id}}" >Add Chapter</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        
+        <div class="col-auto">
+            <a href="#"  data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+                Add Subject
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="addChapterModal" tabindex="-1" aria-labelledby="addChapterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addChapterModalLabel">Add New Chapter</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Add Chapter Form -->
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="chapterName" class="form-label">Chapter Name</label>
+                        <input type="text" class="form-control" id="chapterName" name="chapter_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="chdesc" class="form-label">Chapter description</label>
+                        <input type="text" class="form-control" id="chdesc" name="chdesc" required>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary submitchapter" id="submitchapter">Add Chapter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addSubjectModal" tabindex="-1" aria-labelledby="addSubjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addSubjectModalLabel">Add New Subject</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Add Subject Form -->
+                <form method="POST">
+
+                    
+                    <div class="mb-3">
+                        <label for="subjectName" class="form-label">Subject Name</label>
+                        <input type="text" class="form-control" id="subjectName" name="subject_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subjectDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="subjectDescription" name="subject_description" rows="3"></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary" id="AddSubject">Add Subject</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade " id="editChapterModal" tabindex="-1" aria-labelledby="editChapterModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editChapterModalLabel">Edit Chapter</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="chapterId" class="form-label">Chapter Id</label>
+                        <input type="text" class="form-control" id="chid" name="chaptername"  disabled required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="chapterName" class="form-label">Chapter Name</label>
+                        <input type="text" class="form-control" id="chname" name="chapter_name"  required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="chdesc" class="form-label">Chapter description</label>
+                        <input type="text" class="form-control" id="chdes" name="chdesc"  required>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn btn-primary" id="confirmchanges">Confirm Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editSubjectModal" tabindex="-1" aria-labelledby="editSubjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editSubjectModalLabel">Add New Subject</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+                <form method="POST">
+
+                    <input type="hidden" class="form-control" id="subid" name="subjectid">
+                    <div class="mb-3">
+                        <label for="subjectName" class="form-label">Subject Name</label>
+                        <input type="text" class="form-control" id="subjectNameedit" name="subject_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subjectDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="subjectDescriptionedit" name="subject_description" rows="3"></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary" id="editSubject">Edit Subject</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addchapterbutton = document.querySelectorAll('.add-chapter-button');
+    const subjectid = document.getElementById('subjectid');
+    const addChapterForm = document.getElementById('addChapterForm'); 
+
+    addchapterbutton.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const subid = btn.getAttribute("data-subjectid");
+            subjectid.value = subid; 
+        });
+    });
+
+    const newchapbutton = document.getElementById("submitchapter");
+    newchapbutton.addEventListener('click', (event) => {
+        event.preventDefault(); 
+
+        const chapter_name = document.getElementById("chapterName").value;
+        const chdesc = document.getElementById("chdesc").value;
+        const subid = subjectid.value;
+
+        if (!subid) {
+            alert("Subject ID is missing. Please try again!");
+            return;
+        }
+
+        fetch("/api/chapter", {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                subid: subid,
+                chapter_name: chapter_name,
+                chdesc: chdesc
+            })
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            alert(data.message);
+            location.reload();
+        })
+        .catch((error) => {
+            console.error('Error: ', error);
+        });
+    });
+    const editchaplink=document.querySelectorAll('.editchapter');
+    editchaplink.forEach((Link)=> {
+        Link.addEventListener('click',()=>{
+            const chapid=Link.getAttribute('data-chapterid');
+            fetch(`/api/chapter/${chapid}`,{method:'GET'})
+            .then((response)=>response.json())
+            .then((data)=>{
+                document.getElementById('chid').value=data.id;
+                document.getElementById('chname').value=data.name;
+                document.getElementById('chdes').value=data.description;
+            })
+            .catch((error)=>console.error("Error fetching data",error));
+        });
+    });
+
+    const editchapter=document.getElementById('confirmchanges');
+    editchapter.addEventListener(('click'),()=>{
+        const chapid=document.getElementById('chid').value;
+        const chapname=document.getElementById('chname').value;
+        const chdes=document.getElementById('chdes').value;
+
+        fetch('/api/chapter',{
+            method:'PUT',
+            headers:{
+                'Content-Type':'application/json',
+            },
+            body:JSON.stringify({
+                'chid':chapid,
+                'chname':chapname,
+                'chdes':chdes,
+            })
+        })
+        .then((response)=>response.json())
+        .then((data)=>{
+            alert(data.message);
+            location.reload();
+        })
+        .catch((error)=>{
+            console.error("Error : ",error);
+        });
+    });
+
+
+    const deletebuttons=document.querySelectorAll('.deletechapter');
+    deletebuttons.forEach((deletebutton)=>{
+        deletebutton.addEventListener(('click'),()=>{
+            const chapid=deletebutton.getAttribute('data-chapid');
+            fetch(`/api/chapter/${chapid}`,{method:'DELETE'})
+            .then((response)=>response.json())
+            .then((data)=>{
+                alert(data.message);
+                location.reload();
+            })
+            .catch((error)=>{
+                console.error("error: ",error);
+            });
+        });
+    });
+
+    const addsubject=document.getElementById("AddSubject");
+    addsubject.addEventListener(('click'),()=>{
+        const subname=document.getElementById('subjectName').value;
+        const subdesc=document.getElementById('subjectDescription').value;
+        fetch("/api/subject",{
+            method:'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                "subname":subname,
+                "subdesc":subdesc,
+            })
+
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            alert(data.message);
+            location.reload();
+        })
+        .catch((error) => {
+            console.error('Error: ', error);
+        });
+    });
+
+    const deletesubjects=document.querySelectorAll('.deletesubject');
+    deletesubjects.forEach((deletebutton)=>{
+        deletebutton.addEventListener(('click'),()=>{
+            const subid=deletebutton.getAttribute("data-subid");
+            fetch( `/api/subject/${subid}`,{method:"DELETE"})
+            .then((response)=>response.json())
+            .then((data)=>{
+                alert(data.message);
+                location.reload();
+
+            })
+            .catch((error) => {
+            console.error('Error: ', error);
+            });
+        });
+    });
+
+    const subeditbuttons=document.querySelectorAll(".editsubject");
+    subeditbuttons.forEach((subeditbutton)=>{
+        subeditbutton.addEventListener(('click'),()=>{
+            const subid=subeditbutton.getAttribute('data-subid');
+            fetch(`/api/subject/${subid}`,{method:'GET'})
+            .then((response)=>response.json())
+            .then((data)=>{
+                document.getElementById("subid").value=subid;
+                document.getElementById("subjectNameedit").value=data.subname;
+                document.getElementById("subjectDescriptionedit").value=data.subdesc;
+            })
+            .catch((error) => {
+            console.error('Error: ', error);
+            });
+        });
+    });
+
+    const editsub=document.getElementById('editSubject');
+    editsub.addEventListener(('click'),()=>{
+        const subname=document.getElementById('subjectNameedit').value;
+        const subid=document.getElementById('subid').value;
+        const subdesc=document.getElementById("subjectDescriptionedit").value;
+        fetch("/api/subject",{
+            method:"PUT",
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+                'subid':subid,
+                'subname':subname,
+                'subdesc':subdesc,
+            })
+        })
+        .then((response)=> response.json())
+        .then((data)=>{
+            alert(data.message);
+            location.reload();
+
+        })
+        .catch((error) => {
+            console.error('Error: ', error);
+        })
+
+    });
+
+});
+
+
+</script>
+
+{% endblock %}

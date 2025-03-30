@@ -1,0 +1,519 @@
+{% extends "hometemplate.html" %}
+
+{% block title %}Quizzes{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        {% for quiz in data %}
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4 p-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ quiz.name }}</h5>
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Q. no</th>
+                                <th>Question</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for question in quiz.questions %}
+                            <tr>
+                                <td>{{ loop.index }}</td> <!-- Auto-increment question number -->
+                                <td>{{ question.question }}</td>
+                                <td>
+                                    <a href="#" class="addquestion" data-bs-toggle="modal" data-questionid="{{ question.id }}" data-type="edit" data-bs-target="#addQuestionModal">Edit</a> 
+                                    / <a href="#" class="deletechapter" data-questionid="{{question.id}}">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <a class="btn btn-success addquestion" 
+                       href="#" 
+                       data-bs-toggle="modal" 
+                       data-quizid="{{ quiz.qid }}" 
+                       data-type="add"
+                       data-bs-target="#addQuestionModal">
+                        Add Questions
+                    </a>
+                    <button class="btn btn-danger deletequiz" data-quizid="{{quiz.qid}}">Delete Quiz</button>
+                    <button class="btn btn-primary editquiz" data-quizid="{{quiz.qid}}" data-bs-toggle="modal" data-bs-target="#editquizdetailsmodal">Edit Quiz</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+</div>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        
+        <div class="col-auto">
+            <a  href="#" data-bs-toggle="modal" data-bs-target="#addQuizModal">Add Quiz</a>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addQuestionModal" tabindex="-1" aria-labelledby="addQuestionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addQuestionModalLabel">Add New Question</h5>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="chapter" class="form-label">Chapter</label>
+                            <input type="text" class="form-control" id="chaptername" name="chaptername"   disabled required>
+                        </div>
+
+                        <input type="hidden" id="chapterid" name="chapterid">
+                        <input type="hidden" id="quizid" name="quizid">
+                        <input type="hidden" id="questionid" name="questionid">
+                        
+                        <!-- Correct Answer -->
+                        <div class="col-md-6">
+                            <label for="correctAns" class="form-label">Correct Answer</label>
+                            <select class="form-select" name="correctAns" id="correctAns" required>
+                                <option  value= "" disabled selected>Select an Option</option>
+                                <option value="1">A</option>
+                                <option value="2">B</option>
+                                <option value="3">C</option>
+                                <option value="4">D</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Question Title & Description -->
+                    <div class="mb-3">
+                        <label for="questionTitle" class="form-label">Question Title</label>
+                        <input type="text" class="form-control" id="questionTitle" name="questionTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="questionDesc" class="form-label">Description</label>
+                        <textarea class="form-control" rows="2" name="questionDesc" id="questionDesc" placeholder="Enter the question" required></textarea>
+                    </div>
+
+                    <!-- Options in 2 columns -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="opt1" class="form-label">Option 1 (A)</label>
+                            <input type="text" class="form-control" id="opt1" name="opt1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="opt2" class="form-label">Option 2 (B)</label>
+                            <input type="text" class="form-control" id="opt2" name="opt2" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="opt3" class="form-label">Option 3 (C)</label>
+                            <input type="text" class="form-control" id="opt3" name="opt3" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="opt4" class="form-label">Option 4 (D)</label>
+                            <input type="text" class="form-control" id="opt4" name="opt4" required>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary" id="submitquestion" data-type="add">Add Question</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addQuizModal" tabindex="-1" aria-labelledby="addQuizModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addQuizModalLabel">Add New Quiz</h5>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <div class="row g-3">
+                        <!-- Quiz Name -->
+                        <div class="col-md-6">
+                            <label for="quizName" class="form-label">Quiz Name</label>
+                            <input type="text" class="form-control" id="quizName" name="quizName" required>
+                        </div>
+
+                        <!-- Chapter ID -->
+                        <div class="col-md-6">
+                            <label for="quizChapterId" class="form-label">Chapter</label>
+                            <select class="form-select" id="quizChapterId" name="quizChapterId" required>
+                                <option value="" disabled selected>Select a Chapter</option>
+                                {% for i in chapters %}
+                                <option value="{{i.id}}">Chapter {{i.id}}: {{i.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Description -->
+                    <div class="mb-3">
+                        <label for="quizDesc" class="form-label">Quiz Description</label>
+                        <textarea class="form-control" rows="3" name="quizDesc" id="quizDesc" placeholder="Enter quiz description" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quizTime" class="form-label">Quiz Duration</label>
+                        <input type="time" class="form-control" id="quizTime" name="quizTime" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quizDate" class="form-label">scheduled date</label>
+                        <input type="date" class="form-control" id="quizDate" name="quizDate" required>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary" id="addquizbtn">Add Quiz</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editquizdetailsmodal" tabindex="-1" aria-labelledby="editquizdetailsmodal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="EditQuizModalLabel">Edit Quiz</h5>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <div class="row g-3">
+                        <input type="hidden" class="form-control" id="qid" name="qid">
+                        <!-- Quiz Name -->
+                        <div class="col-md-6">
+                            <label for="quizName" class="form-label">Quiz Name</label>
+                            <input type="text" class="form-control" id="quizname" name="quizName" required>
+                        </div>
+
+                        <!-- Chapter ID -->
+                        <div class="col-md-6">
+                            <label for="quizChapterId" class="form-label">Chapter</label>
+                            <select class="form-select" id="quizchapterId" name="quizChapterId" required>
+                                <option value="" disabled selected>Select a Chapter</option>
+                                {% for i in chapters %}
+                                <option value="{{i.id}}">Chapter {{i.id}}: {{i.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Quiz Description -->
+                    <div class="mb-3">
+                        <label for="quizdesc" class="form-label">Quiz Description</label>
+                        <textarea class="form-control" rows="3" name="quizDesc" id="quizdesc" placeholder="Enter quiz description" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quiztime" class="form-label">Quiz Duration</label>
+                        <input type="time" class="form-control" id="quiztime" name="quizTime" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quizdate" class="form-label">scheduled date</label>
+                        <input type="date" class="form-control" id="quizdate" name="quizDate" required>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary" id="editquizbtn">Edit Quiz</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded',function(){
+        const addquestionbutton = document.querySelectorAll(".addquestion");
+        addquestionbutton.forEach((btn) => {
+        btn.addEventListener("click", function(event){
+            
+            const actionType = btn.getAttribute("data-type");
+
+            if (actionType === "add") {
+
+                const quizid = btn.getAttribute("data-quizid");
+                document.getElementById('addQuestionModalLabel').textContent="Add New Question";
+                const submitbutton=document.getElementById("submitquestion");
+                submitbutton.setAttribute("data-type",'add')
+                fetch(`/api/quiz/${quizid}`, { method: 'GET' })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        fillQuizDetails(data);
+                        clearQuestionFields();
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching quiz details:", error);
+                    });
+
+            } else if (actionType === "edit") {
+                // Handle editing an existing question
+                const questionid = btn.getAttribute("data-questionid");
+                const submitbutton=document.getElementById("submitquestion");
+                document.getElementById('addQuestionModalLabel').textContent="Edit Question";
+                submitbutton.setAttribute("data-type",'edit')
+                fetch(`/api/question/${questionid}`, { method: 'GET' })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        fillQuizDetails(data);
+                        fillQuestionDetails(data);
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching quiz details:", error);
+                    });
+                }
+            });
+        });
+
+   
+        function fillQuizDetails(data) {
+            document.getElementById('chaptername').value = data.chaptername;
+            document.getElementById('chapterid').value = data.chapterid;
+            document.getElementById('quizid').value = data.quizid;
+        }
+
+        function fillQuestionDetails(data) {
+            document.getElementById('questionid').value = data.qsid;
+            document.getElementById('questionTitle').value = data.qstitle;
+            document.getElementById('questionDesc').value=data.qstn;
+            document.getElementById('opt1').value = data.opt1;
+            document.getElementById('opt2').value = data.opt2;
+            document.getElementById('opt3').value = data.opt3;
+            document.getElementById('opt4').value = data.opt4;
+            document.getElementById('correctAns').value = data.correctopt;
+        }
+        function clearQuestionFields() {
+            document.getElementById('questionTitle').value = "";
+            document.getElementById('questionid').value="";
+            document.getElementById('questionDesc').value="";
+            document.getElementById('opt1').value = "";
+            document.getElementById('opt2').value = "";
+            document.getElementById('opt3').value = "";
+            document.getElementById('opt4').value = "";
+            document.getElementById('correctAns').value = "";
+        }
+
+
+
+        const submitqs=document.getElementById("submitquestion");
+        submitqs.addEventListener('click',()=>{
+            const opt1=document.getElementById("opt1").value;
+            const opt2=document.getElementById("opt2").value;
+            const opt3=document.getElementById("opt3").value;
+            const opt4=document.getElementById("opt4").value;
+            const correctopt=document.getElementById("correctAns").value;
+            const qstitle=document.getElementById("questionTitle").value;
+            const qstn=document.getElementById("questionDesc").value;
+            const chid=document.getElementById("chapterid").value;
+            const qid=document.getElementById('quizid').value;
+
+            actionType=submitqs.getAttribute('data-type');
+            if (actionType=="add"){
+                fetch("/api/question",{
+                    method:'POST',
+                    headers:{
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        'qstitle':qstitle,
+                        'qstn':qstn,
+                        'opt1':opt1,
+                        'opt2':opt2,
+                        'opt3':opt3,
+                        'opt4':opt4,
+                        'correctopt':correctopt,
+                        'chid':chid,
+                        'qid':qid,
+                    })
+                })
+                .then((response)=>response.json())
+                .then((data)=>{
+                    alert(data.message);
+                    location.reload();
+                })
+                .catch((error)=>{
+                    console.error(error);
+                });
+            }
+            else if (actionType=="edit"){
+                const qsid=document.getElementById("questionid").value;
+                fetch("/api/question",{
+                    method:'PUT',
+                    headers:{
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        'qsid':qsid,
+                        'qstitle':qstitle,
+                        'qstn':qstn,
+                        'opt1':opt1,
+                        'opt2':opt2,
+                        'opt3':opt3,
+                        'opt4':opt4,
+                        'correctopt':correctopt,
+                        'chid':chid,
+                        'qid':qid,
+                    })
+                })
+                .then((response)=>response.json())
+                .then((data)=>{
+                    alert(data.message);
+                    location.reload();
+                })
+                .catch((error)=>{
+                    console.error(error);
+                });
+            }
+
+
+        });
+    
+
+        const deletebuttons=document.querySelectorAll('.deletechapter');
+        deletebuttons.forEach((deletebutton)=>{
+            deletebutton.addEventListener(('click'),()=>{
+                const qid=deletebutton.getAttribute('data-questionid');
+                fetch(`/api/question/${qid}`,{method:'DELETE'})
+                .then((response)=>response.json())
+                .then((data)=>{
+                    alert(data.message);
+                    location.reload();
+                })
+                .catch((error)=>{
+                    console.error("error: ",error);
+                });
+            });
+        });
+
+        const addquizbtn=document.getElementById('addquizbtn');
+        addquizbtn.addEventListener('click',(event)=>{
+            event.preventDefault();
+            const quizname=document.getElementById('quizName').value;
+            const chapid=document.getElementById('quizChapterId').value;
+            const duration=document.getElementById('quizTime').value;
+            const qdate=document.getElementById('quizDate').value;
+            const det=document.getElementById('quizDesc').value;
+
+            fetch("/api/quiz",{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json",
+                },
+                body:JSON.stringify({
+                    'chid':chapid,
+                    "name":quizname,
+                    "duration":duration,
+                    "date":qdate,
+                    "desc":det,
+
+                })
+            })
+            .then((response)=>response.json())
+            .then((data)=>{
+                alert(data.message);
+                location.reload();
+            })
+            .catch((error)=>{
+                console.error("error: ",error);
+            });
+        });
+        const deletequiz=document.querySelectorAll('.deletequiz');
+            deletequiz.forEach((button)=>{
+                button.addEventListener(('click'),()=>{
+                    const qid=button.getAttribute('data-quizid');
+                    fetch(`/api/quiz/${qid}`,{method:'DELETE'})
+                    .then((response)=>response.json())
+                    .then((data)=>{
+                        alert(data.message);
+                        location.reload();
+                    })
+                    .catch((error)=>{
+                        console.error("error: ",error);
+                    });
+                });
+
+
+        });
+
+        const editquizbuttons=document.querySelectorAll(".editquiz")
+        editquizbuttons.forEach((editquizbutton)=>{
+            editquizbutton.addEventListener(('click'),()=>{
+                const qid=editquizbutton.getAttribute('data-quizid');
+                fetch(`/api/quiz/${qid}`,{
+                    method:'GET',
+                })
+                .then((response)=> response.json())
+                .then((data)=>{
+                    console.log(data);
+                    document.getElementById("qid").value=qid,
+                    document.getElementById("quizname").value=data.quizname;
+                    document.getElementById("quizchapterId").value=data.chapterid;
+                    document.getElementById('quiztime').value=data.quiztime;
+                    document.getElementById('quizdate').value=data.quizdate;
+                    document.getElementById('quizdesc').value=data.desc;
+                })
+                .catch((error)=>{
+                        console.error("error: ",error);
+                    });
+
+            });
+        });
+
+        const confirmedit=document.getElementById('editquizbtn');
+        confirmedit.addEventListener(('click'),()=>{
+            const qid=document.getElementById("qid").value;
+            const name=document.getElementById("quizname").value;
+            const chid= document.getElementById("quizchapterId").value;
+            const duration=document.getElementById('quiztime').value;
+            const date=document.getElementById('quizdate').value;
+            const desc=document.getElementById('quizdesc').value;
+
+            fetch("/api/quiz",{
+                method:"PUT",
+                headers:{
+                    "Content-Type":"application/json",
+                },
+                body:JSON.stringify({
+                    "qid":qid,
+                    "chid":chid,
+                    "name":name,
+                    "duration":duration,
+                    "date":date,
+                    "desc":desc,
+                })
+            })
+            .then((response)=>response.json())
+            .then((data)=>{
+                alert(data.message);
+                location.reload();
+            })
+            .catch((error)=>{
+                console.error(error)
+            })
+        })
+    });
+
+
+
+
+</script>
+
+
+
+{% endblock %}
